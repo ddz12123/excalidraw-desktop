@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "description": "Local-first offline Excalidraw desktop app",
-  "author": "ddz12123",
+  "author": "ddz12123 <ddz12123@users.noreply.github.com>",
   "license": "MIT",
   "homepage": "https://github.com/ddz12123/excalidraw-desktop",
   "repository": {
