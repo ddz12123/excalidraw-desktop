@@ -10,6 +10,15 @@ type ThrottledFn<T extends unknown[]> = ((...args: T) => void) & {
   cancel: () => void;
 };
 
+vi.mock("@excalidraw/mermaid-to-excalidraw", async (importActual) => {
+  const module = (await importActual()) as any;
+
+  return {
+    __esModule: true,
+    ...module,
+  };
+});
+
 export const mockThrottleRAF: typeof throttleRAFType = <T extends unknown[]>(
   fn: (...args: T) => void,
 ) => {
@@ -27,14 +36,6 @@ export const mockMermaidToExcalidraw = (opts: {
   parseMermaidToExcalidraw: typeof parseMermaidToExcalidraw;
   mockRef?: boolean;
 }) => {
-  vi.mock("@excalidraw/mermaid-to-excalidraw", async (importActual) => {
-    const module = (await importActual()) as any;
-
-    return {
-      __esModule: true,
-      ...module,
-    };
-  });
   const parseMermaidToExcalidrawSpy = vi.spyOn(
     MermaidToExcalidraw,
     "parseMermaidToExcalidraw",

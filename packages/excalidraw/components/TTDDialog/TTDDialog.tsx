@@ -6,46 +6,13 @@ import { useUIAppState } from "../../context/ui-appState";
 import { t } from "../../i18n";
 import { useApp } from "../App";
 import { Dialog } from "../Dialog";
-import { withInternalFallback } from "../hoc/withInternalFallback";
 
 import MermaidToExcalidraw from "./MermaidToExcalidraw";
-import TextToDiagram from "./TextToDiagram";
-import TTDDialogTabs from "./TTDDialogTabs";
-import { TTDDialogTabTriggers } from "./TTDDialogTabTriggers";
-import { TTDDialogTabTrigger } from "./TTDDialogTabTrigger";
-import { TTDDialogTab } from "./TTDDialogTab";
 import { isModuleLoadError } from "./utils/mermaidError";
 
 import "./TTDDialog.scss";
 
-import { TTDWelcomeMessage } from "./TTDWelcomeMessage";
-
-import type {
-  MermaidToExcalidrawLibProps,
-  TTDPersistenceAdapter,
-  TTTDDialog,
-} from "./types";
-
-export const TTDDialog = (
-  props:
-    | {
-        onTextSubmit: TTTDDialog.onTextSubmit;
-        renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
-        renderWarning?: TTTDDialog.renderWarning;
-        persistenceAdapter: TTDPersistenceAdapter;
-      }
-    | { __fallback: true },
-) => {
-  const appState = useUIAppState();
-
-  if (appState.openDialog?.name !== "ttd") {
-    return null;
-  }
-
-  return <TTDDialogBase {...props} tab={appState.openDialog.tab} />;
-};
-
-TTDDialog.WelcomeMessage = TTDWelcomeMessage;
+import type { MermaidToExcalidrawLibProps } from "./types";
 
 const loadMermaidToExcalidrawLib = (
   onChunkLoadError: (api: MermaidToExcalidrawLibProps["api"]) => void,
@@ -73,150 +40,102 @@ const loadMermaidToExcalidrawLib = (
   return api;
 };
 
-/**
- * Text to diagram (TTD) dialog
- */
-const TTDDialogBase = withInternalFallback(
-  "TTDDialogBase",
-  ({
-    tab,
-    ...rest
-  }: {
-    tab: "text-to-diagram" | "mermaid";
-  } & (
-    | {
-        onTextSubmit(
-          props: TTTDDialog.OnTextSubmitProps,
-        ): Promise<TTTDDialog.OnTextSubmitRetValue>;
-        renderWelcomeScreen?: TTTDDialog.renderWelcomeScreen;
-        renderWarning?: TTTDDialog.renderWarning;
-        persistenceAdapter: TTDPersistenceAdapter;
-      }
-    | { __fallback: true }
-  )) => {
-    const app = useApp();
+const TTDDialogBase = () => {
+  const app = useApp();
 
-    const [mermaidToExcalidrawLib, setMermaidToExcalidrawLib] =
-      useState<MermaidToExcalidrawLibProps>(() => ({
-        status: "loading",
-        api: loadMermaidToExcalidrawLib((api) => setLoadError(api)),
-      }));
+  const [mermaidToExcalidrawLib, setMermaidToExcalidrawLib] =
+    useState<MermaidToExcalidrawLibProps>(() => ({
+      status: "loading",
+      api: loadMermaidToExcalidrawLib((api) => setLoadError(api)),
+    }));
 
-    // `api` (or one of the chunks it lazy-loads) failed to load
-    const setLoadError = useCallback(
-      (api: MermaidToExcalidrawLibProps["api"]) => {
-        const reloadRequired = navigator.onLine;
-        setMermaidToExcalidrawLib((prev) =>
-          prev.api === api
-            ? {
-                ...prev,
-                status: "error",
-                reloadRequired: prev.reloadRequired || reloadRequired,
-              }
-            : prev,
-        );
-      },
-      [],
-    );
-
-    const retryLoadingMermaidToExcalidrawLib = useCallback(() => {
+  // `api` (or one of the chunks it lazy-loads) failed to load
+  const setLoadError = useCallback(
+    (api: MermaidToExcalidrawLibProps["api"]) => {
+      const reloadRequired = navigator.onLine;
       setMermaidToExcalidrawLib((prev) =>
-        prev.status === "error"
+        prev.api === api
           ? {
               ...prev,
-              status: "loading",
-              api: loadMermaidToExcalidrawLib(setLoadError),
+              status: "error",
+              reloadRequired: prev.reloadRequired || reloadRequired,
             }
           : prev,
       );
-    }, [setLoadError]);
+    },
+    [],
+  );
 
-    const { api: mermaidToExcalidrawLibApi } = mermaidToExcalidrawLib;
-    useEffect(() => {
-      const api = mermaidToExcalidrawLibApi;
-      api.then(
-        () => {
-          setMermaidToExcalidrawLib((prev) =>
-            prev.api === api
-              ? { ...prev, status: "loaded", reloadRequired: false }
-              : prev,
-          );
-        },
-        (error: any) => {
-          console.error("Failed to load mermaid-to-excalidraw", error);
-          setLoadError(api);
-        },
-      );
-    }, [mermaidToExcalidrawLibApi, setLoadError]);
-
-    // the lib chunk isn't precached, so a failed load is most likely due to
-    // being offline -> retry automatically once we're back online
-    useEffect(() => {
-      if (mermaidToExcalidrawLib.status !== "error") {
-        return;
-      }
-      return addEventListener(
-        app.ownerWindow,
-        "online",
-        retryLoadingMermaidToExcalidrawLib,
-      );
-    }, [
-      app,
-      mermaidToExcalidrawLib.status,
-      retryLoadingMermaidToExcalidrawLib,
-    ]);
-
-    return (
-      <Dialog
-        className="ttd-dialog"
-        onCloseRequest={() => {
-          app.setOpenDialog(null);
-        }}
-        size={1520}
-        title={false}
-        {...rest}
-        autofocus={false}
-      >
-        <TTDDialogTabs dialog="ttd" tab={tab}>
-          {"__fallback" in rest && rest.__fallback ? (
-            <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
-          ) : (
-            <TTDDialogTabTriggers>
-              <TTDDialogTabTrigger tab="text-to-diagram">
-                <div className="ttd-dialog-tab-trigger__content">
-                  {t("labels.textToDiagram")}
-                  <div className="ttd-dialog-tab-trigger__badge">
-                    {t("chat.aiBeta")}
-                  </div>
-                </div>
-              </TTDDialogTabTrigger>
-              <TTDDialogTabTrigger tab="mermaid">
-                {t("mermaid.label")}
-              </TTDDialogTabTrigger>
-            </TTDDialogTabTriggers>
-          )}
-
-          {!("__fallback" in rest) && (
-            <TTDDialogTab className="ttd-dialog-content" tab="text-to-diagram">
-              <TextToDiagram
-                mermaidToExcalidrawLib={mermaidToExcalidrawLib}
-                onRetryLoad={retryLoadingMermaidToExcalidrawLib}
-                onTextSubmit={rest.onTextSubmit}
-                renderWelcomeScreen={rest.renderWelcomeScreen}
-                renderWarning={rest.renderWarning}
-                persistenceAdapter={rest.persistenceAdapter}
-              />
-            </TTDDialogTab>
-          )}
-          <TTDDialogTab className="ttd-dialog-content" tab="mermaid">
-            <MermaidToExcalidraw
-              mermaidToExcalidrawLib={mermaidToExcalidrawLib}
-              onRetryLoad={retryLoadingMermaidToExcalidrawLib}
-              isActive={tab === "mermaid"}
-            />
-          </TTDDialogTab>
-        </TTDDialogTabs>
-      </Dialog>
+  const retryLoadingMermaidToExcalidrawLib = useCallback(() => {
+    setMermaidToExcalidrawLib((prev) =>
+      prev.status === "error"
+        ? {
+            ...prev,
+            status: "loading",
+            api: loadMermaidToExcalidrawLib(setLoadError),
+          }
+        : prev,
     );
-  },
-);
+  }, [setLoadError]);
+
+  const { api: mermaidToExcalidrawLibApi } = mermaidToExcalidrawLib;
+  useEffect(() => {
+    const api = mermaidToExcalidrawLibApi;
+    api.then(
+      () => {
+        setMermaidToExcalidrawLib((prev) =>
+          prev.api === api
+            ? { ...prev, status: "loaded", reloadRequired: false }
+            : prev,
+        );
+      },
+      (error: any) => {
+        console.error("Failed to load mermaid-to-excalidraw", error);
+        setLoadError(api);
+      },
+    );
+  }, [mermaidToExcalidrawLibApi, setLoadError]);
+
+  useEffect(() => {
+    if (mermaidToExcalidrawLib.status !== "error") {
+      return;
+    }
+    return addEventListener(
+      app.ownerWindow,
+      "online",
+      retryLoadingMermaidToExcalidrawLib,
+    );
+  }, [app, mermaidToExcalidrawLib.status, retryLoadingMermaidToExcalidrawLib]);
+
+  return (
+    <Dialog
+      className="ttd-dialog"
+      onCloseRequest={() => {
+        app.setOpenDialog(null);
+      }}
+      size={1520}
+      title={false}
+      autofocus={false}
+    >
+      <p className="dialog-mermaid-title">{t("mermaid.title")}</p>
+      <MermaidToExcalidraw
+        mermaidToExcalidrawLib={mermaidToExcalidrawLib}
+        onRetryLoad={retryLoadingMermaidToExcalidrawLib}
+        isActive
+      />
+    </Dialog>
+  );
+};
+
+/**
+ * Mermaid to Excalidraw dialog
+ */
+export const TTDDialog = () => {
+  const appState = useUIAppState();
+
+  if (appState.openDialog?.name !== "ttd") {
+    return null;
+  }
+
+  return <TTDDialogBase />;
+};

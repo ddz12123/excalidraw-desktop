@@ -20,7 +20,6 @@ import App, {
 } from "./components/App";
 import { InitializeApp } from "./components/InitializeApp";
 import Footer from "./components/footer/FooterCenter";
-import LiveCollaborationTrigger from "./components/live-collaboration/LiveCollaborationTrigger";
 import MainMenu from "./components/main-menu/MainMenu";
 import WelcomeScreen from "./components/welcome-screen/WelcomeScreen";
 import { defaultLang } from "./i18n";
@@ -111,7 +110,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
     children,
     validateEmbeddable,
     renderEmbeddable,
-    aiEnabled,
     showDeprecatedFonts,
     renderScrollbars,
     viewportStatusFrame,
@@ -254,7 +252,6 @@ const ExcalidrawBase = (props: ExcalidrawProps) => {
           onDuplicate={onDuplicate}
           validateEmbeddable={validateEmbeddable}
           renderEmbeddable={renderEmbeddable}
-          aiEnabled={aiEnabled !== false}
           showDeprecatedFonts={showDeprecatedFonts}
           renderScrollbars={renderScrollbars}
           viewportStatusFrame={viewportStatusFrame}
@@ -477,22 +474,9 @@ export {
 } from "./components/App";
 
 export { WelcomeScreen };
-export { LiveCollaborationTrigger };
 export { Stats } from "./components/Stats";
 
 export { DefaultSidebar } from "./components/DefaultSidebar";
-export { TTDDialog } from "./components/TTDDialog/TTDDialog";
-export { TTDDialogTrigger } from "./components/TTDDialog/TTDDialogTrigger";
-export {
-  TTDStreamFetch,
-  parseSSEStream,
-} from "./components/TTDDialog/utils/TTDStreamFetch";
-export type { StreamChunk } from "./components/TTDDialog/utils/TTDStreamFetch";
-export type {
-  TTDPersistenceAdapter,
-  SavedChat,
-  SavedChats,
-} from "./components/TTDDialog/types";
 
 export type {
   ViewportStatusFrame,
@@ -510,7 +494,6 @@ export {
 
 export { elementsOverlappingBBox } from "@excalidraw/element";
 
-export { DiagramToCodePlugin } from "./components/DiagramToCodePlugin/DiagramToCodePlugin";
 export { getDataURL } from "./data/blob";
 export { isElementLink } from "@excalidraw/element";
 

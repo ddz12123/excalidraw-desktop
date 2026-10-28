@@ -1,0 +1,22 @@
+packages:
+  - excalidraw-app
+  - packages/*
+
+nodeLinker: hoisted
+shamefullyHoist: true
+autoInstallPeers: true
+strictPeerDependencies: false
+
+minimumReleaseAgeExclude:
+  - '@excalidraw/mermaid-to-excalidraw@3.1.0'
+  - electron@45.1.0
+
+overrides:
+  "nanoid@4.0.2": "5.1.16"
+
+allowBuilds:
+  "@parcel/watcher": true
+  core-js: false
+  electron: true
+  electron-winstaller: true
+  esbuild: true

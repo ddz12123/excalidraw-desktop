@@ -171,7 +171,8 @@ describe("multi-window editors", () => {
       images,
       setTimeoutSpy,
       canvasCount: () =>
-        createElement.mock.calls.filter(([tag]) => tag === "canvas").length,
+        createElement.mock.calls.filter(([tag]) => (tag as string) === "canvas")
+          .length,
     };
   };
 
@@ -216,7 +217,9 @@ describe("multi-window editors", () => {
       await waitFor(() => expect(realmB.canvasCount()).toBeGreaterThan(0));
       // the module's own document is not a fallback for either of them
       expect(
-        mainCreateElement.mock.calls.filter(([tag]) => tag === "canvas"),
+        mainCreateElement.mock.calls.filter(
+          ([tag]) => (tag as string) === "canvas",
+        ),
       ).toHaveLength(0);
 
       // the same goes for images: the scene image, the not-yet-decoded

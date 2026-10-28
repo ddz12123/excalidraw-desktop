@@ -22,7 +22,7 @@ import {
   waitFor,
 } from "./test-utils";
 
-import type { MockInstance } from "vitest";
+import type { Mock, MockInstance } from "vitest";
 
 import type { ExcalidrawProps } from "../types";
 
@@ -875,7 +875,8 @@ describe("interaction={false} ui={false}", () => {
 });
 
 describe("interaction={{ enabled: { links } }}", () => {
-  let onLinkOpenSpy: ReturnType<typeof vi.fn>;
+  type OnLinkOpen = NonNullable<ExcalidrawProps["onLinkOpen"]>;
+  let onLinkOpenSpy: Mock<OnLinkOpen>;
   let windowOpenSpy: MockInstance<typeof window.open>;
 
   // prevent default inside the handler so the editor doesn't call
@@ -886,7 +887,7 @@ describe("interaction={{ enabled: { links } }}", () => {
   };
 
   beforeEach(() => {
-    onLinkOpenSpy = vi.fn();
+    onLinkOpenSpy = vi.fn<OnLinkOpen>();
     windowOpenSpy = vi.spyOn(window, "open").mockReturnValue(null);
   });
 

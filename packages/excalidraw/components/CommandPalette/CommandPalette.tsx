@@ -49,7 +49,6 @@ import {
   bucketFillIcon,
   ExportImageIcon,
   mermaidLogoIcon,
-  brainIconThin,
   LibraryIcon,
   historyCommandIcon,
 } from "../icons";
@@ -561,27 +560,11 @@ function CommandPaletteInner({
           },
         },
         {
-          label: `${t("labels.textToDiagram")}...`,
-          category: DEFAULT_CATEGORIES.tools,
-          icon: brainIconThin,
-          viewMode: false,
-          predicate: appProps.aiEnabled,
-          perform: () => {
-            setAppState((state) => ({
-              ...state,
-              openDialog: {
-                name: "ttd",
-                tab: "text-to-diagram",
-              },
-            }));
-          },
-        },
-        {
           label: `${t("toolBar.mermaidToExcalidraw")}...`,
           category: DEFAULT_CATEGORIES.tools,
           icon: mermaidLogoIcon,
           viewMode: false,
-          predicate: appProps.aiEnabled,
+          predicate: true,
           perform: () => {
             setAppState((state) => ({
               ...state,
@@ -592,16 +575,6 @@ function CommandPaletteInner({
             }));
           },
         },
-        // {
-        //   label: `${t("toolBar.magicframe")}...`,
-        //   category: DEFAULT_CATEGORIES.tools,
-        //   icon: MagicIconThin,
-        //   viewMode: false,
-        //   predicate: appProps.aiEnabled,
-        //   perform: () => {
-        //     app.onMagicframeToolSelect();
-        //   },
-        // },
       ];
 
       const allCommands = [

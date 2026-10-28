@@ -15,7 +15,6 @@ import {
   shouldRotateWithDiscreteAngle,
   isArrowKey,
   KEYS,
-  APP_NAME,
   CURSOR_TYPE,
   DEFAULT_STROKE_STREAMLINE,
   DEFAULT_STROKE_STREAMLINE_PRECISE,
@@ -357,7 +356,6 @@ import {
   type SetViewportOptions,
   getViewportForZoomWithScrollConstraints,
 } from "../viewport";
-import { ElementCanvasButtons } from "../components/ElementCanvasButtons";
 import { LaserTrails } from "../laserTrails";
 import { withBatchedUpdates, withBatchedUpdatesThrottled } from "../reactUtils";
 import { isOverScrollBars } from "../scene/scrollbars";
@@ -404,7 +402,6 @@ import { activeEyeDropperAtom } from "./EyeDropper";
 import { FileDropOverlay } from "./FileDropOverlay";
 import { ViewportStatusBorder } from "./ViewportStatusFrame/ViewportStatusFrame";
 import LayerUI from "./LayerUI";
-import { ElementCanvasButton } from "./MagicButton";
 import { SVGLayer } from "./SVGLayer";
 import Spinner from "./Spinner";
 import { searchItemInFocusAtom } from "./SearchMenu";
@@ -415,7 +412,6 @@ import NewElementCanvas from "./canvases/NewElementCanvas";
 import { isPointHittingLink } from "./hyperlink/helpers";
 import { AppHost } from "./App.host";
 import { CursorHint, CursorHints } from "./CursorHint";
-import { MagicIcon, copyIcon, fullscreenIcon } from "./icons";
 import { AppStateObserver, type OnStateChange } from "./AppStateObserver";
 
 import { findShapeByKey, TOGGLE_TOOLS } from "./Tools";
@@ -2527,80 +2523,6 @@ class App extends React.Component<AppProps, AppState> {
                                 }
                               />
                             )}
-                          {this.isDefaultUIEnabled() &&
-                            this.props.aiEnabled !== false &&
-                            selectedElements.length === 1 &&
-                            isMagicFrameElement(firstSelectedElement) && (
-                              <ElementCanvasButtons
-                                element={firstSelectedElement}
-                                elementsMap={renderableElementsMap}
-                              >
-                                <ElementCanvasButton
-                                  title={t("labels.convertToCode")}
-                                  icon={MagicIcon}
-                                  checked={false}
-                                  onChange={() =>
-                                    this.onMagicFrameGenerate(
-                                      firstSelectedElement,
-                                      "button",
-                                    )
-                                  }
-                                />
-                              </ElementCanvasButtons>
-                            )}
-                          {this.isDefaultUIEnabled() &&
-                            selectedElements.length === 1 &&
-                            isIframeElement(firstSelectedElement) &&
-                            firstSelectedElement.customData?.generationData
-                              ?.status === "done" && (
-                              <ElementCanvasButtons
-                                element={firstSelectedElement}
-                                elementsMap={renderableElementsMap}
-                              >
-                                <ElementCanvasButton
-                                  title={t("labels.copySource")}
-                                  icon={copyIcon}
-                                  checked={false}
-                                  onChange={() =>
-                                    this.onIframeSrcCopy(firstSelectedElement)
-                                  }
-                                />
-                                <ElementCanvasButton
-                                  title="Enter fullscreen"
-                                  icon={fullscreenIcon}
-                                  checked={false}
-                                  onChange={() => {
-                                    const iframe =
-                                      this.getHTMLIFrameElement(
-                                        firstSelectedElement,
-                                      );
-                                    if (iframe) {
-                                      try {
-                                        iframe.requestFullscreen();
-                                        this.setState({
-                                          activeEmbeddable: {
-                                            element: firstSelectedElement,
-                                            state: "active",
-                                          },
-                                          selectedElementIds: {
-                                            [firstSelectedElement.id]: true,
-                                          },
-                                          newElement: null,
-                                          selectionElement: null,
-                                        });
-                                      } catch (err: any) {
-                                        console.warn(err);
-                                        this.setState({
-                                          errorMessage:
-                                            "Couldn't enter fullscreen",
-                                        });
-                                      }
-                                    }
-                                  }}
-                                />
-                              </ElementCanvasButtons>
-                            )}
-
                           {this.isDefaultUIEnabled() && this.state.contextMenu && (
                             <ContextMenu
                               items={this.state.contextMenu.items}
@@ -3873,16 +3795,7 @@ class App extends React.Component<AppProps, AppState> {
       this.resizeObserver?.observe(this.excalidrawContainerRef.current);
     }
 
-    const searchParams = new URLSearchParams(
-      this.ownerWindow.location.search.slice(1),
-    );
-
-    if (searchParams.has("web-share-target")) {
-      // Obtain a file that was shared via the Web Share Target API.
-      this.restoreFileFromShare();
-    } else {
-      this.updateDOMRect(this.initializeScene);
-    }
+    this.updateDOMRect(this.initializeScene);
 
     // note that this check seems to always pass in localhost
     if (isBrave() && !isMeasureTextSupported()) {
@@ -4895,27 +4808,6 @@ class App extends React.Component<AppProps, AppState> {
       duration: 8000,
     });
   }
-
-  restoreFileFromShare = async () => {
-    try {
-      const webShareTargetCache = await caches.open("web-share-target");
-
-      const response = await webShareTargetCache.match("shared-file");
-      if (response) {
-        const blob = await response.blob();
-        const file = new File([blob], blob.name || "", { type: blob.type });
-        this.loadFileToCanvas(file, null);
-        await webShareTargetCache.delete("shared-file");
-        this.ownerWindow.history.replaceState(
-          null,
-          APP_NAME,
-          this.ownerWindow.location.pathname,
-        );
-      }
-    } catch (error: any) {
-      this.setState({ errorMessage: error.message });
-    }
-  };
 
   /**
    * adds supplied files to existing files in the appState.

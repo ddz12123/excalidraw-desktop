@@ -491,7 +491,7 @@ export interface AppState {
   openDialog:
     | null
     | { name: "imageExport" | "help" | "jsonExport" }
-    | { name: "ttd"; tab: "text-to-diagram" | "mermaid" }
+    | { name: "ttd"; tab: "mermaid" }
     | { name: "commandPalette" }
     | { name: "settings" }
     | { name: "elementLinkSelector"; sourceElementId: ExcalidrawElement["id"] }
@@ -1069,7 +1069,6 @@ export interface ExcalidrawProps {
     element: NonDeleted<ExcalidrawEmbeddableElement>,
     appState: AppState,
   ) => JSX.Element | null;
-  aiEnabled?: boolean;
   showDeprecatedFonts?: boolean;
   renderScrollbars?: boolean;
   viewportStatusFrame?: ViewportStatusFrame | null;
@@ -1127,17 +1126,6 @@ export type SceneData = {
 
 export type ExportOpts = {
   saveFileToDisk?: boolean;
-  onExportToBackend?: (
-    exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: UIAppState,
-    files: BinaryFiles,
-  ) => void;
-  renderCustomUI?: (
-    exportedElements: readonly NonDeletedExcalidrawElement[],
-    appState: UIAppState,
-    files: BinaryFiles,
-    canvas: HTMLCanvasElement,
-  ) => JSX.Element;
 };
 
 export type ImageOptions = Partial<{
@@ -1196,7 +1184,6 @@ export type AppProps = Merge<
     handleKeyboardGlobally: boolean;
     isCollaborating: boolean;
     children?: React.ReactNode;
-    aiEnabled: boolean;
   }
 >;
 

@@ -125,10 +125,6 @@ const DefaultMainMenu: React.FC<{
       <MainMenu.DefaultItems.Help />
       <MainMenu.DefaultItems.ClearCanvas />
       <MainMenu.Separator />
-      <MainMenu.Group title="Excalidraw links">
-        <MainMenu.DefaultItems.Socials />
-      </MainMenu.Group>
-      <MainMenu.Separator />
       <MainMenu.DefaultItems.ToggleTheme allowSystemTheme={false} />
       <MainMenu.DefaultItems.ChangeCanvasBackground />
     </MainMenu>
@@ -502,7 +498,7 @@ const LayerUI = ({
       {/* Keep supporting surfaces available to host-supplied UI, including
           MainMenu.DefaultItems. */}
       <DefaultOverwriteConfirmDialog />
-      {appState.openDialog?.name === "ttd" && <TTDDialog __fallback />}
+      {appState.openDialog?.name === "ttd" && <TTDDialog />}
       {/* ------------------------------------------------------------------ */}
 
       {defaultUIEnabled && appState.isLoading && <LoadingMessage delay={250} />}

@@ -103,6 +103,13 @@
     "canvasBackground": "Canvas background",
     "drawingCanvas": "Drawing canvas",
     "clearCanvas": "Clear canvas",
+    "checkForUpdates": "Check for updates",
+    "checkingForUpdates": "Checking for updates...",
+    "updatesUnavailable": "Auto update is not available in this build.",
+    "file": "File",
+    "edit": "Edit",
+    "view": "View",
+    "insert": "Insert",
     "layers": "Layers",
     "actions": "Actions",
     "language": "Language",
@@ -214,7 +221,7 @@
   },
   "library": {
     "noItems": "No items added yet...",
-    "hint_emptyLibrary": "Select an item on canvas to add it here, or install a library from the public repository, below.",
+    "hint_emptyLibrary": "Select an item on canvas to add it here.",
     "hint_emptyPrivateLibrary": "Select an item on canvas to add it here.",
     "search": {
       "inputPlaceholder": "Search library",

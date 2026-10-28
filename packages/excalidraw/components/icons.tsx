@@ -76,18 +76,6 @@ const arrowheadPreviewIconProps: Opts = {
 
 // -----------------------------------------------------------------------------
 
-// tabler-icons: present
-export const PlusPromoIcon = createIcon(
-  <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <rect x={3} y={8} width={18} height={4} rx={1} />
-    <line x1={12} y1={8} x2={12} y2={21} />
-    <path d="M19 12v7a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-7" />
-    <path d="M7.5 8a2.5 2.5 0 0 1 0 -5a4.8 8 0 0 1 4.5 5a4.8 8 0 0 1 4.5 -5a2.5 2.5 0 0 1 0 5" />
-  </g>,
-  tablerIconProps,
-);
-
 // tabler-icons: book
 export const LibraryIcon = createIcon(
   <g strokeWidth="1.25">
@@ -562,23 +550,6 @@ export const GithubIcon = createIcon(
   modifiedTablerIconProps,
 );
 
-export const DiscordIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path d="M7.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM12.5 10.833a.833.833 0 1 0 0-1.666.833.833 0 0 0 0 1.666ZM6.25 6.25c2.917-.833 4.583-.833 7.5 0M5.833 13.75c2.917.833 5.417.833 8.334 0" />
-    <path d="M12.917 14.167c0 .833 1.25 2.5 1.666 2.5 1.25 0 2.361-1.39 2.917-2.5.556-1.39.417-4.861-1.25-9.584-1.214-.846-2.5-1.116-3.75-1.25l-.833 2.084M7.083 14.167c0 .833-1.13 2.5-1.526 2.5-1.191 0-2.249-1.39-2.778-2.5-.529-1.39-.397-4.861 1.19-9.584 1.157-.846 2.318-1.116 3.531-1.25l.833 2.084" />
-  </g>,
-  modifiedTablerIconProps,
-);
-
-export const XBrandIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
-    <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
-  </g>,
-  tablerIconProps,
-);
-
 export const checkIcon = createIcon(
   <polyline fill="none" stroke="currentColor" points="20 6 9 17 4 12" />,
   {
@@ -704,46 +675,8 @@ export const questionCircle = createIcon(
   { mirror: true },
 );
 
-export const share = createIcon(
-  <path
-    d="M5 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM15 7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM15 17.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM7.25 8.917l5.5-2.834M7.25 11.083l5.5 2.834"
-    strokeWidth="1.5"
-  />,
-  modifiedTablerIconProps,
-);
-
 export const warning = createIcon(
   "M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z",
-);
-
-export const shareIOS = createIcon(
-  "M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z",
-  { width: 24, height: 24 },
-);
-
-export const exportToPlus = createIcon(
-  <g strokeWidth={1.25}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M8 9h-1a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-8a2 2 0 0 0 -2 -2h-1" />
-    <path d="M12 14v-11" />
-    <path d="M9 6l3 -3l3 3" />
-  </g>,
-  tablerIconProps,
-);
-
-export const shareWindows = createIcon(
-  <>
-    <path
-      fill="currentColor"
-      d="M40 5.6v6.1l-4.1.7c-8.9 1.4-16.5 6.9-20.6 15C13 32 10.9 43 12.4 43c.4 0 2.4-1.3 4.4-3 5-3.9 12.1-7 18.2-7.7l5-.6v12.8l11.2-11.3L62.5 22 51.2 10.8 40-.5v6.1zm10.2 22.6L44 34.5v-6.8l-6.9.6c-3.9.3-9.8 1.7-13.2 3.1-3.5 1.4-6.5 2.4-6.7 2.2-.9-1 3-7.5 6.4-10.8C28 18.6 34.4 16 40.1 16c3.7 0 3.9-.1 3.9-3.2V9.5l6.2 6.3 6.3 6.2-6.3 6.2z"
-    />
-    <path
-      stroke="currentColor"
-      fill="currentColor"
-      d="M0 36v20h48v-6.2c0-6 0-6.1-2-4.3-1.1 1-2 2.9-2 4.2V52H4V34c0-17.3-.1-18-2-18s-2 .7-2 20z"
-    />
-  </>,
-  { width: 64, height: 64 },
 );
 
 // Icon imported form Storybook
@@ -933,17 +866,6 @@ export const CenterHorizontallyIcon = createIcon(
     <path d="M4.792 13.125v.417c0 .92.746 1.666 1.666 1.666h7.084c.92 0 1.666-.746 1.666-1.666v-.417c0-.92-.746-1.667-1.666-1.667H6.458c-.92 0-1.666.746-1.666 1.667ZM6.458 6.458v.417c0 .92.747 1.667 1.667 1.667h3.75c.92 0 1.667-.747 1.667-1.667v-.417c0-.92-.746-1.666-1.667-1.666h-3.75c-.92 0-1.667.746-1.667 1.666Z" />
   </g>,
   modifiedTablerIconProps,
-);
-
-export const usersIcon = createIcon(
-  <g strokeWidth="1.5">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-    <circle cx="9" cy="7" r="4"></circle>
-    <path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"></path>
-    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-    <path d="M21 21v-2a4 4 0 0 0 -3 -3.85"></path>
-  </g>,
-  tablerIconProps,
 );
 
 // not mirrored because it's inspired by a playback control, which is always RTL
@@ -2128,32 +2050,6 @@ export const eyeClosedIcon = createIcon(
   tablerIconProps,
 );
 
-export const brainIcon = createIcon(
-  <g stroke="currentColor" fill="none">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M15.5 13a3.5 3.5 0 0 0 -3.5 3.5v1a3.5 3.5 0 0 0 7 0v-1.8" />
-    <path d="M8.5 13a3.5 3.5 0 0 1 3.5 3.5v1a3.5 3.5 0 0 1 -7 0v-1.8" />
-    <path d="M17.5 16a3.5 3.5 0 0 0 0 -7h-.5" />
-    <path d="M19 9.3v-2.8a3.5 3.5 0 0 0 -7 0" />
-    <path d="M6.5 16a3.5 3.5 0 0 1 0 -7h.5" />
-    <path d="M5 9.3v-2.8a3.5 3.5 0 0 1 7 0v10" />
-  </g>,
-  tablerIconProps,
-);
-
-export const brainIconThin = createIcon(
-  <g strokeWidth={1.25}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M15.5 13a3.5 3.5 0 0 0 -3.5 3.5v1a3.5 3.5 0 0 0 7 0v-1.8" />
-    <path d="M8.5 13a3.5 3.5 0 0 1 3.5 3.5v1a3.5 3.5 0 0 1 -7 0v-1.8" />
-    <path d="M17.5 16a3.5 3.5 0 0 0 0 -7h-.5" />
-    <path d="M19 9.3v-2.8a3.5 3.5 0 0 0 -7 0" />
-    <path d="M6.5 16a3.5 3.5 0 0 1 0 -7h.5" />
-    <path d="M5 9.3v-2.8a3.5 3.5 0 0 1 7 0v10" />
-  </g>,
-  tablerIconProps,
-);
-
 export const searchIcon = createIcon(
   <g strokeWidth={1.5}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -2354,26 +2250,6 @@ export const DeviceDesktopIcon = createIcon(
   { ...tablerIconProps, strokeWidth: 1.5 },
 );
 
-// login
-export const loginIcon = createIcon(
-  <g strokeWidth={1.5}>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M15 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
-    <path d="M21 12h-13l3 -3" />
-    <path d="M11 15l-3 -3" />
-  </g>,
-  tablerIconProps,
-);
-
-export const youtubeIcon = createIcon(
-  <g>
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M2 8a4 4 0 0 1 4 -4h12a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-12a4 4 0 0 1 -4 -4v-8z" />
-    <path d="M10 9l5 3l-5 3z" />
-  </g>,
-  tablerIconProps,
-);
-
 export const gridIcon = createIcon(
   <g strokeWidth={1.5}>
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -2538,18 +2414,6 @@ export const messageCircleIcon = createIcon(
   <g strokeWidth="1.25">
     <path stroke="none" d="M0 0h24v24H0z" fill="none" />
     <path d="M3 20l1.3 -3.9c-2.324 -3.437 -1.426 -7.872 2.1 -10.374c3.526 -2.501 8.59 -2.296 11.845 .48c3.255 2.777 3.695 7.266 1.029 10.501c-2.666 3.235 -7.615 4.215 -11.574 2.293l-4.7 1" />
-  </g>,
-  tablerIconProps,
-);
-
-export const presentationIcon = createIcon(
-  <g strokeWidth="1.25">
-    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-    <path d="M3 4l18 0" />
-    <path d="M4 4v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-10" />
-    <path d="M12 16l0 4" />
-    <path d="M9 20l6 0" />
-    <path d="M8 12l3 -3l2 2l3 -3" />
   </g>,
   tablerIconProps,
 );

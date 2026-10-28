@@ -99,6 +99,13 @@
     "canvasBackground": "画布背景",
     "drawingCanvas": "绘制 Canvas",
     "clearCanvas": "清除画布",
+    "checkForUpdates": "检查更新",
+    "checkingForUpdates": "正在检查更新...",
+    "updatesUnavailable": "当前构建不支持自动更新。",
+    "file": "文件",
+    "edit": "编辑",
+    "view": "视图",
+    "insert": "插入",
     "layers": "图层",
     "actions": "操作",
     "language": "语言",
@@ -204,7 +211,7 @@
   },
   "library": {
     "noItems": "尚未添加任何项目……",
-    "hint_emptyLibrary": "选中画布上的项目添加到此处，或从下方的公共素材库中导入。",
+    "hint_emptyLibrary": "选中画布上的项目添加到此处。",
     "hint_emptyPrivateLibrary": "选中画布上的项目添加到此处。",
     "search": {
       "inputPlaceholder": "搜索库",
