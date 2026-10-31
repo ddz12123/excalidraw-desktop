@@ -1,0 +1,137 @@
+.mcp-settings-dialog {
+  .Dialog__content {
+    padding-top: 0.5rem;
+  }
+}
+
+@keyframes mcp-settings-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.mcp-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  font-size: 0.875rem;
+
+  &__description {
+    margin: 0;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+  }
+
+  &__label {
+    font-weight: 600;
+  }
+
+  &__hint {
+    margin: 0.125rem 0 0;
+    color: var(--color-text-secondary);
+    font-size: 0.8125rem;
+    line-height: 1.5;
+  }
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-secondary);
+    word-break: break-all;
+    line-height: 1.5;
+
+    &--running .mcp-settings__status-dot {
+      background-color: var(--color-success);
+      opacity: 1;
+    }
+
+    &--error {
+      color: var(--color-danger);
+
+      .mcp-settings__status-dot {
+        background-color: var(--color-danger);
+        opacity: 1;
+      }
+    }
+  }
+
+  &__status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background-color: var(--color-text-secondary);
+    opacity: 0.5;
+  }
+
+  &__switch-skeleton {
+    width: 40px;
+    height: 20px;
+    flex: 0 0 auto;
+    border-radius: 12px;
+    background-color: var(--color-surface-low);
+    animation: mcp-settings-pulse 1.2s ease-in-out infinite;
+  }
+
+  &__row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+
+    .ExcTextField {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+  }
+
+  &__section-title {
+    font-weight: 600;
+  }
+
+  &__pre {
+    margin: 0.625rem 0 0;
+    padding: 0.75rem;
+    max-height: 13rem;
+    overflow: auto;
+    border-radius: var(--border-radius-md);
+    background-color: var(--color-surface-low);
+    color: inherit;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    user-select: text;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  &__config-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.625rem;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__error {
+    margin: 0;
+    color: var(--color-danger);
+    line-height: 1.5;
+    word-break: break-word;
+  }
+}

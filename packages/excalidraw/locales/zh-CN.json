@@ -102,6 +102,7 @@
     "checkForUpdates": "检查更新",
     "checkingForUpdates": "正在检查更新...",
     "updatesUnavailable": "当前构建不支持自动更新。",
+    "mcpServer": "MCP 服务器",
     "file": "文件",
     "edit": "编辑",
     "view": "视图",
@@ -655,6 +656,30 @@
         "description": "加载外部绘图将<bold>替换您现有的内容</bold>。<br></br>您可以先使用下列方式备份您的绘图。"
       }
     }
+  },
+  "mcpServer": {
+    "title": "MCP 服务器",
+    "description": "通过本地服务让 Claude Desktop、Cursor、VS Code 等 MCP 客户端读取和编辑当前画布。服务只监听 127.0.0.1，并需要访问令牌。",
+    "enabled": "启用 MCP 服务器",
+    "enabledHint": "应用启动时自动开启。",
+    "port": "端口",
+    "token": "访问令牌",
+    "regenerateToken": "重新生成",
+    "statusRunning": "运行中",
+    "statusStopped": "已停止",
+    "statusError": "启动失败",
+    "loading": "加载中…",
+    "clientConfig": "MCP 客户端配置",
+    "clientConfigHint": "把下面的配置粘贴到 Claude Desktop、Cursor 或其他 MCP 客户端。配置通过 npx + mcp-remote 连接本地服务。",
+    "copyConfig": "复制配置",
+    "copyEndpoint": "复制 Endpoint",
+    "copied": "已复制",
+    "toolsHint": "可用工具：get_scene、add_elements、update_elements、delete_elements、export_image。",
+    "save": "保存并应用",
+    "saved": "MCP 服务器设置已保存",
+    "invalidPort": "端口必须是 1024 到 65535 之间的整数。",
+    "invalidToken": "访问令牌至少需要 16 个字符。",
+    "desktopOnly": "MCP 服务器仅在桌面应用中可用。"
   },
   "mermaid": {
     "title": "Mermaid 至 Excalidraw",

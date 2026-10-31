@@ -6,15 +6,20 @@
 
 Fork 自 [excalidraw/excalidraw](https://github.com/excalidraw/excalidraw)。
 
+## 截图
+
+![Excalidraw Desktop](./public/images/home.png)
+
 ## 功能
 
 - 完全本地编辑，无需账号，不依赖云端
 - 画布、图片和素材库全部保存在本地
-- 关闭应用前进行二次确认
+- 关闭时可选择最小化到系统托盘或退出应用，并提供托盘菜单
 - 自定义无边框顶栏，包含窗口控制和分类菜单
 - 支持 GitHub Releases 自动更新，菜单中提供“检查更新”
 - 支持 Mermaid 转 Excalidraw
 - 支持文件和图片导出
+- 内置 MCP 服务器，Claude Desktop、Cursor、VS Code 可直接操作当前画布
 - 生产环境阻断外部网络请求
 
 ## 下载
@@ -76,6 +81,20 @@ pnpm exec electron-builder --linux --x64
 
 打包版本启动后会自动检查更新，也可以在菜单中手动选择“检查更新”。默认未启用代码签名；macOS 自动更新需要应用已签名并公证。
 
+## MCP 服务器
+
+桌面端可以把当前画布开放给 Claude Desktop、Cursor、VS Code 等 MCP 客户端：
+
+1. 打开 `编辑 → MCP 服务器…`。
+2. 启用服务器并点击“保存并应用”。
+3. 复制生成的客户端配置到 MCP 客户端并重启客户端。
+
+服务只监听 `127.0.0.1`，并且需要设置里的访问令牌。提供 `get_scene`、`add_elements`、`update_elements`、`delete_elements`、`export_image` 五个工具。生成的配置通过 `npx -y mcp-remote <endpoint>` 连接，兼容只支持 stdio 的客户端；支持 Streamable HTTP 的客户端可以直接使用 Endpoint URL。设置保存在应用用户数据目录下的 `mcp-server.json`。使用 `npx` 的机器需要安装 Node.js。
+
+![MCP 服务器示例](./public/images/mcp-example.png)
+
+项目内提供了可直接使用的技能：[`skills/excalidraw-desktop-mcp/SKILL.md`](./skills/excalidraw-desktop-mcp/SKILL.md)，需要时复制到对应 agent 的技能/规则目录即可。
+
 ## 检查
 
 ```bash
@@ -87,8 +106,10 @@ pnpm test:other
 ## 目录结构
 
 - `src/main` - Electron 主进程、窗口、离线协议和自动更新
+- `src/main/mcp` - 本地 MCP 服务器、设置存储和渲染层桥接
 - `src/preload` - 最小化隔离预加载桥接
 - `excalidraw-app` - 渲染进程入口和应用 UI
+- `excalidraw-app/mcp` - 渲染层 MCP 工具实现
 - `packages/*` - 内部编辑器源码包，不再对外发布
 
 ## 许可证

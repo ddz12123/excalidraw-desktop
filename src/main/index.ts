@@ -7,12 +7,16 @@ import {
   dialog,
   ipcMain,
   Menu,
+  nativeImage,
   net,
   protocol,
   session,
   shell,
+  Tray,
 } from "electron";
 import { autoUpdater } from "electron-updater";
+
+import { setupMcp, shutdownMcp } from "./mcp";
 
 import type { MenuItemConstructorOptions } from "electron";
 
@@ -26,42 +30,159 @@ const rendererDir = join(__dirname, "../renderer");
 const preloadPath = join(__dirname, "../preload/index.js");
 
 let allowQuit = false;
-let isConfirmingQuit = false;
+let isPrompting = false;
+let tray: Tray | null = null;
 let interactiveUpdateCheck = false;
 
-const confirmQuit = () => {
-  if (allowQuit || isConfirmingQuit) {
+const getParentWindow = () =>
+  BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0];
+
+const quitApp = () => {
+  allowQuit = true;
+  app.quit();
+};
+
+const showWindow = () => {
+  const window = BrowserWindow.getAllWindows()[0];
+
+  if (!window) {
+    createWindow();
     return;
   }
 
-  const parent =
-    BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0];
+  if (window.isMinimized()) {
+    window.restore();
+  }
 
-  isConfirmingQuit = true;
+  window.show();
+  window.focus();
+};
+
+const promptClose = (window: BrowserWindow) => {
+  if (allowQuit || isPrompting) {
+    return;
+  }
+
+  const canMinimizeToTray = !!tray && !tray.isDestroyed();
+  const buttons = canMinimizeToTray
+    ? ["取消", "最小化到托盘", "退出应用"]
+    : ["取消", "退出应用"];
+  const minimizeIndex = canMinimizeToTray ? 1 : -1;
+  const exitIndex = canMinimizeToTray ? 2 : 1;
+
+  isPrompting = true;
   void dialog
-    .showMessageBox(parent, {
+    .showMessageBox(window, {
+      type: "question",
+      title: "关闭 Excalidraw",
+      message: canMinimizeToTray
+        ? "要最小化到系统托盘，还是退出应用？"
+        : "确定要退出 Excalidraw 吗？",
+      detail: canMinimizeToTray
+        ? "最小化到托盘后应用会继续在后台运行，可以从系统托盘图标重新打开。"
+        : "当前画布会自动保存到本地，下次启动后可以继续编辑。",
+      buttons,
+      defaultId: canMinimizeToTray ? minimizeIndex : 0,
+      cancelId: 0,
+      noLink: true,
+    })
+    .then(({ response }) => {
+      if (response === exitIndex) {
+        quitApp();
+        return;
+      }
+
+      if (
+        response === minimizeIndex &&
+        tray &&
+        !tray.isDestroyed() &&
+        !window.isDestroyed()
+      ) {
+        window.hide();
+      }
+    })
+    .catch(() => undefined)
+    .finally(() => {
+      isPrompting = false;
+    });
+};
+
+const promptQuit = () => {
+  if (allowQuit || isPrompting) {
+    return;
+  }
+
+  isPrompting = true;
+  void dialog
+    .showMessageBox(getParentWindow(), {
       type: "question",
       title: "确认退出",
       message: "确定要退出 Excalidraw 吗？",
       detail: "当前画布会自动保存到本地，下次启动后可以继续编辑。",
-      buttons: ["取消", "退出"],
+      buttons: ["取消", "退出应用"],
       defaultId: 1,
       cancelId: 0,
       noLink: true,
     })
     .then(({ response }) => {
       if (response === 1) {
-        allowQuit = true;
-        app.quit();
+        quitApp();
       }
     })
+    .catch(() => undefined)
     .finally(() => {
-      isConfirmingQuit = false;
+      isPrompting = false;
     });
 };
 
-const getParentWindow = () =>
-  BrowserWindow.getFocusedWindow() ?? BrowserWindow.getAllWindows()[0];
+const loadTrayIcon = () => {
+  const iconPath = isDev
+    ? join(__dirname, "../../resources/icon.png")
+    : join(process.resourcesPath, "icon.png");
+  const image = nativeImage.createFromPath(iconPath);
+
+  if (image.isEmpty()) {
+    return null;
+  }
+
+  const size = process.platform === "darwin" ? 18 : 16;
+  return image.resize({ width: size, height: size });
+};
+
+const createTray = async () => {
+  if (tray) {
+    return;
+  }
+
+  let icon = loadTrayIcon();
+
+  if (!icon) {
+    try {
+      icon = await app.getFileIcon(process.execPath, { size: "small" });
+    } catch (error) {
+      console.warn("[tray] failed to load the executable icon", error);
+    }
+  }
+
+  try {
+    tray = new Tray(icon ?? nativeImage.createEmpty());
+    tray.setToolTip("Excalidraw");
+    tray.setContextMenu(
+      Menu.buildFromTemplate([
+        { label: "显示主窗口", click: showWindow },
+        { type: "separator" },
+        { label: "退出应用", click: quitApp },
+      ]),
+    );
+
+    if (process.platform !== "darwin") {
+      tray.on("click", showWindow);
+    }
+  } catch (error) {
+    console.error("[tray] failed to create", error);
+    tray = null;
+  }
+};
 
 const setWindowTitle = (title: string) => {
   const window = getParentWindow();
@@ -325,13 +446,21 @@ const createWindow = () => {
     openExternal(url);
   });
 
+  window.webContents.on("will-prevent-unload", (event) => {
+    // quit already confirmed; the renderer's beforeunload guard (in-flight
+    // image saves) must not cancel it silently
+    if (allowQuit) {
+      event.preventDefault();
+    }
+  });
+
   window.on("close", (event) => {
     if (allowQuit) {
       return;
     }
 
     event.preventDefault();
-    confirmQuit();
+    promptClose(window);
   });
 
   if (process.env.ELECTRON_RENDERER_URL) {
@@ -351,14 +480,7 @@ if (!gotLock) {
   app.setAppUserModelId("com.ddz12123.excalidraw-desktop");
 
   app.on("second-instance", () => {
-    const window = BrowserWindow.getAllWindows()[0];
-    if (!window) {
-      return;
-    }
-    if (window.isMinimized()) {
-      window.restore();
-    }
-    window.focus();
+    showWindow();
   });
 
   app.whenReady().then(() => {
@@ -368,12 +490,16 @@ if (!gotLock) {
     setupAutoUpdater();
     setupWindowIpc();
     createWindow();
+    void createTray();
+    try {
+      setupMcp();
+    } catch (error) {
+      console.error("[mcp] setup failed", error);
+    }
     startBackgroundUpdateCheck();
 
     app.on("activate", () => {
-      if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
-      }
+      showWindow();
     });
   });
 
@@ -383,7 +509,13 @@ if (!gotLock) {
     }
 
     event.preventDefault();
-    confirmQuit();
+    promptQuit();
+  });
+
+  app.on("will-quit", () => {
+    tray?.destroy();
+    tray = null;
+    shutdownMcp();
   });
 
   app.on("window-all-closed", () => {

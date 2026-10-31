@@ -6,15 +6,20 @@ Local-first, fully offline Excalidraw desktop app built with Electron.
 
 Forked from [excalidraw/excalidraw](https://github.com/excalidraw/excalidraw).
 
+## Screenshots
+
+![Excalidraw Desktop](./public/images/home.png)
+
 ## Features
 
 - fully local editing, no accounts and no cloud
 - local scene persistence, local image storage, local libraries
-- native quit confirmation before closing the app
+- close prompt with minimize-to-tray and quit options, plus a tray menu
 - custom frameless top bar with window controls and categorized menus
 - GitHub Releases auto-update with a Check for updates menu item
 - Mermaid to Excalidraw conversion
 - file and image export
+- local MCP server so Claude Desktop, Cursor and VS Code can drive the canvas
 - external network requests blocked in production
 
 ## Download
@@ -69,6 +74,20 @@ Pushing a tag starting with `v` (for example `v0.1.0`) triggers `.github/workflo
 
 Packaged builds check for updates shortly after startup and also expose "Check for updates" in the main menu. Code signing is disabled by default; macOS auto-update requires a signed and notarized app.
 
+## MCP server
+
+The desktop app can expose the open canvas to MCP clients such as Claude Desktop, Cursor and VS Code.
+
+1. Open `Edit → MCP Server…`.
+2. Enable the server, then click **Save and apply**.
+3. Copy the generated client config into your MCP client and restart it.
+
+The server binds to `127.0.0.1` only and requires the access token shown in the dialog. It provides `get_scene`, `add_elements`, `update_elements`, `delete_elements` and `export_image` tools. The generated config uses `npx -y mcp-remote <endpoint>` so stdio-only clients work; clients with native Streamable HTTP support can use the endpoint URL directly. Settings are stored in `mcp-server.json` in the app's user data directory. `npx` requires Node.js on the machine running the MCP client.
+
+![MCP server example](./public/images/mcp-example.png)
+
+A ready-to-use skill lives at [`skills/excalidraw-desktop-mcp/SKILL.md`](./skills/excalidraw-desktop-mcp/SKILL.md); copy it into any agent's skill/rule directory when needed.
+
 ## Checks
 
 ```bash
@@ -80,8 +99,10 @@ pnpm test:other
 ## Structure
 
 - `src/main` - Electron main process, window, offline protocol and updater
+- `src/main/mcp` - local MCP server, settings storage and renderer bridge
 - `src/preload` - minimal isolated preload bridge
 - `excalidraw-app` - renderer entry and app UI
+- `excalidraw-app/mcp` - renderer-side MCP tool implementations
 - `packages/*` - internal editor source packages (not published)
 
 ## License

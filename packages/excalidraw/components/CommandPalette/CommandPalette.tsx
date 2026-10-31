@@ -860,6 +860,7 @@ function CommandPaletteInner({
       title={false}
       size={720}
       autofocus
+      showCloseButton={false}
       className="command-palette-dialog"
     >
       <TextField

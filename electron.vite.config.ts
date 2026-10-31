@@ -1,10 +1,23 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "electron-vite";
 import svgrPlugin from "vite-plugin-svgr";
 
+import type { Plugin } from "vite";
+
 const root = __dirname;
+const { version } = JSON.parse(
+  readFileSync(path.resolve(root, "package.json"), "utf8"),
+) as { version: string };
+
+const injectVersion = (): Plugin => ({
+  name: "inject-version",
+  transformIndexHtml(html) {
+    return html.replaceAll("{version}", version);
+  },
+});
 
 const alias = [
   {
@@ -89,7 +102,6 @@ export default defineConfig({
     build: {
       outDir: path.resolve(root, "out/renderer"),
       emptyOutDir: true,
-      sourcemap: true,
       // don't auto-inline small assets (i.e. fonts)
       assetsInlineLimit: 0,
       rolldownOptions: {
@@ -106,6 +118,6 @@ export default defineConfig({
         },
       },
     },
-    plugins: [react(), svgrPlugin()],
+    plugins: [react(), svgrPlugin(), injectVersion()],
   },
 });

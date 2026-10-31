@@ -172,6 +172,20 @@ export class FileManager {
       ]);
 
       return { loadedFiles, erroredFiles };
+    } catch (error) {
+      // a failed storage read must not leave files stuck in "loading", or
+      // exports waiting on them never finish
+      console.error(error);
+      const erroredFiles = new Map<FileId, true>(
+        ids.map((id): [FileId, true] => [id, true]),
+      );
+      for (const fileId of erroredFiles.keys()) {
+        this.erroredFiles_fetch.set(fileId, true);
+      }
+      this._onFileStatusChange?.(
+        ids.map((id) => [id, "error"] as [FileId, "error"]),
+      );
+      return { loadedFiles: [], erroredFiles };
     } finally {
       for (const id of ids) {
         this.fetchingFiles.delete(id);

@@ -12,6 +12,7 @@ import {
 import {
   GithubIcon,
   mermaidLogoIcon,
+  settingsIcon,
 } from "@excalidraw/excalidraw/components/icons";
 import { OverwriteConfirmDialog } from "@excalidraw/excalidraw/components/OverwriteConfirm/OverwriteConfirm";
 import {
@@ -21,7 +22,7 @@ import {
   preventUnload,
   resolvablePromise,
 } from "@excalidraw/common";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { t } from "@excalidraw/excalidraw/i18n";
 import { isElementLink } from "@excalidraw/element";
 import {
@@ -58,6 +59,8 @@ import CustomStats from "./CustomStats";
 import { Provider, useAtomValue, appJotaiStore } from "./app-jotai";
 import { STORAGE_KEYS, SYNC_BROWSER_TABS_TIMEOUT } from "./app_constants";
 import { AppTopBar } from "./components/AppTopBar";
+import { McpSettingsDialog } from "./components/McpSettingsDialog";
+import { handleMcpCommand } from "./mcp/commands";
 import { AppWelcomeScreen } from "./components/AppWelcomeScreen";
 import { TopErrorBoundary } from "./components/TopErrorBoundary";
 
@@ -93,6 +96,8 @@ const ExcalidrawWrapper = () => {
 
   const [langCode, setLangCode] = useAppLangCode();
 
+  const [isMcpSettingsOpen, setIsMcpSettingsOpen] = useState(false);
+
   const initialStatePromiseRef = useRef<{
     promise: ResolvablePromise<ExcalidrawInitialDataState | null>;
   }>({ promise: null! });
@@ -106,6 +111,16 @@ const ExcalidrawWrapper = () => {
     adapter: LibraryIndexedDBAdapter,
     migrationAdapter: LibraryLocalStorageMigrationAdapter,
   });
+
+  useEffect(() => {
+    if (!excalidrawAPI) {
+      return;
+    }
+
+    return window.desktop?.mcp?.onCommand((request) =>
+      handleMcpCommand(excalidrawAPI, request.command, request.params),
+    );
+  }, [excalidrawAPI]);
 
   // ---------------------------------------------------------------------------
   // initial scene + local file loading
@@ -402,12 +417,17 @@ const ExcalidrawWrapper = () => {
             appTheme={appTheme}
             onThemeChange={setAppTheme}
             onOpenMermaid={onOpenMermaid}
+            onOpenMcpSettings={() => setIsMcpSettingsOpen(true)}
           />
           <AppWelcomeScreen />
           <OverwriteConfirmDialog>
             <OverwriteConfirmDialog.Actions.ExportToImage />
             <OverwriteConfirmDialog.Actions.SaveToDisk />
           </OverwriteConfirmDialog>
+
+          {isMcpSettingsOpen && (
+            <McpSettingsDialog onClose={() => setIsMcpSettingsOpen(false)} />
+          )}
 
           {localStorageQuotaExceeded && (
             <div className="alert alert--danger">
@@ -434,6 +454,14 @@ const ExcalidrawWrapper = () => {
                 perform: () => {
                   window.open(GITHUB_REPO_URL, "_blank", "noopener noreferrer");
                 },
+              },
+              {
+                label: t("labels.mcpServer"),
+                icon: settingsIcon,
+                category: DEFAULT_CATEGORIES.tools,
+                predicate: !!window.desktop?.mcp,
+                keywords: ["mcp", "claude", "cursor", "server", "ai"],
+                perform: () => setIsMcpSettingsOpen(true),
               },
             ]}
           />

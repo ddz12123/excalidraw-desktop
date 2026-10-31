@@ -65,6 +65,31 @@ const CloseIcon = () => (
   </svg>
 );
 
+const McpIcon = () => (
+  <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
+    <rect
+      x="3"
+      y="3.5"
+      width="14"
+      height="5"
+      rx="1.5"
+      fill="none"
+      stroke="currentColor"
+    />
+    <rect
+      x="3"
+      y="11.5"
+      width="14"
+      height="5"
+      rx="1.5"
+      fill="none"
+      stroke="currentColor"
+    />
+    <circle cx="6.5" cy="6" r="0.9" fill="currentColor" />
+    <circle cx="6.5" cy="14" r="0.9" fill="currentColor" />
+  </svg>
+);
+
 const TopBarMenu = ({
   id,
   label,
@@ -113,11 +138,13 @@ export const AppTopBar = ({
   appTheme,
   onThemeChange,
   onOpenMermaid,
+  onOpenMcpSettings,
 }: {
   editorTheme: Theme;
   appTheme: Theme | "system";
   onThemeChange: (theme: Theme | "system") => void;
   onOpenMermaid: () => void;
+  onOpenMcpSettings: () => void;
 }) => {
   const app = useApp();
   const excalidrawAPI = useExcalidrawAPI();
@@ -128,6 +155,7 @@ export const AppTopBar = ({
 
   const controls = window.desktop?.windowControls;
   const canCheckUpdates = !!window.desktop?.checkForUpdates;
+  const canUseMcp = !!window.desktop?.mcp;
 
   useEffect(() => {
     setContainer(app.ownerDocument.getElementById("app-top-bar-root"));
@@ -211,6 +239,14 @@ export const AppTopBar = ({
           <MainMenu.DefaultItems.SearchMenu />
           <MainMenu.Separator />
           <MainMenu.DefaultItems.Preferences />
+          {canUseMcp && (
+            <>
+              <MainMenu.Separator />
+              <MainMenu.Item icon={<McpIcon />} onSelect={onOpenMcpSettings}>
+                {t("labels.mcpServer")}
+              </MainMenu.Item>
+            </>
+          )}
         </TopBarMenu>
 
         <TopBarMenu

@@ -1,0 +1,114 @@
+{
+  "elements": [
+    {
+      "type": "text",
+      "x": 80,
+      "y": 40,
+      "text": "MCP 测试示例",
+      "fontSize": 28
+    },
+    {
+      "type": "rectangle",
+      "id": "start",
+      "x": 80,
+      "y": 120,
+      "width": 180,
+      "height": 80,
+      "label": { "text": "开始", "fontSize": 20 },
+      "backgroundColor": "#b2f2bb",
+      "fillStyle": "solid",
+      "roundness": { "type": 3 },
+      "strokeWidth": 2
+    },
+    {
+      "type": "diamond",
+      "id": "check",
+      "x": 340,
+      "y": 110,
+      "width": 160,
+      "height": 100,
+      "label": { "text": "通过？", "fontSize": 20 },
+      "backgroundColor": "#ffec99",
+      "fillStyle": "solid",
+      "strokeWidth": 2
+    },
+    {
+      "type": "rectangle",
+      "id": "save",
+      "x": 580,
+      "y": 120,
+      "width": 180,
+      "height": 80,
+      "label": { "text": "导出 PNG", "fontSize": 20 },
+      "backgroundColor": "#a5d8ff",
+      "fillStyle": "solid",
+      "roundness": { "type": 3 },
+      "strokeWidth": 2
+    },
+    {
+      "type": "rectangle",
+      "id": "fail",
+      "x": 350,
+      "y": 280,
+      "width": 140,
+      "height": 80,
+      "label": { "text": "修复", "fontSize": 20 },
+      "backgroundColor": "#ffc9c9",
+      "fillStyle": "solid",
+      "roundness": { "type": 3 },
+      "strokeWidth": 2
+    },
+    {
+      "type": "stickynote",
+      "x": 820,
+      "y": 110,
+      "width": 200,
+      "height": 160,
+      "label": { "text": "测试便签", "fontSize": 20 }
+    },
+    {
+      "type": "arrow",
+      "x": 260,
+      "y": 160,
+      "width": 80,
+      "height": 0,
+      "start": { "id": "start" },
+      "end": { "id": "check" },
+      "strokeWidth": 2
+    },
+    {
+      "type": "arrow",
+      "x": 500,
+      "y": 160,
+      "width": 80,
+      "height": 0,
+      "start": { "id": "check" },
+      "end": { "id": "save" },
+      "label": { "text": "是", "fontSize": 18, "labelPosition": 0.5 },
+      "strokeWidth": 2
+    },
+    {
+      "type": "arrow",
+      "x": 420,
+      "y": 210,
+      "width": 0,
+      "height": 70,
+      "points": [
+        [0, 0],
+        [0, 70]
+      ],
+      "start": { "id": "check" },
+      "end": { "id": "fail" },
+      "label": { "text": "否", "fontSize": 18, "labelPosition": 0.5 },
+      "strokeWidth": 2
+    },
+    {
+      "type": "text",
+      "x": 80,
+      "y": 440,
+      "text": "由 Excalidraw Desktop MCP 生成 · add_elements + export_image",
+      "fontSize": 16,
+      "strokeColor": "#868e96"
+    }
+  ]
+}

@@ -149,6 +149,16 @@ export class LocalData {
     }
   };
 
+  /** saves even while the window is hidden (e.g. programmatic MCP edits) */
+  static forceSave = (
+    elements: readonly ExcalidrawElement[],
+    appState: AppState,
+    files: BinaryFiles,
+    onFilesSaved: () => void,
+  ) => {
+    this._save(elements, appState, files, onFilesSaved);
+  };
+
   static flushSave = () => {
     this._save.flush();
   };
@@ -185,7 +195,7 @@ export class LocalData {
 
           try {
             // save loaded files back to storage with updated `lastRetrieved`
-            setMany(filesToSave, filesStore);
+            await setMany(filesToSave, filesStore);
           } catch (error) {
             console.warn(error);
           }

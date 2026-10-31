@@ -29,6 +29,7 @@ export interface DialogProps {
   title: React.ReactNode | false;
   autofocus?: boolean;
   closeOnClickOutside?: boolean;
+  showCloseButton?: boolean;
 }
 
 function getDialogSize(size: DialogSize): number {
@@ -119,7 +120,7 @@ export const Dialog = (props: DialogProps) => {
             <span className="Dialog__titleContent">{props.title}</span>
           </h2>
         )}
-        {isFullscreen && (
+        {props.showCloseButton !== false && (
           <button
             className="Dialog__close"
             onClick={onClose}
