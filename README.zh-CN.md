@@ -75,7 +75,7 @@ pnpm exec electron-builder --linux --x64
 
 ## 发布流水线
 
-推送以 `v` 开头的 tag（例如 `v0.1.0`）会触发 `.github/workflows/release.yml`，自动构建 Windows、macOS 和 Linux 安装包，发布到 GitHub Releases，并上传 `latest.yml`、`latest-mac.yml`、`latest-linux.yml` 供 `electron-updater` 使用。
+推送以 `v` 开头的 tag（例如 `v0.1.1`）会触发 `.github/workflows/release.yml`，自动构建 Windows、macOS 和 Linux 安装包，发布到 GitHub Releases，并上传 `latest.yml`、`latest-mac.yml`、`latest-linux.yml` 供 `electron-updater` 使用。
 
 打 tag 前请先同步修改 `package.json` 中的 `version`，确保 tag、安装包版本和更新元数据一致。
 

@@ -70,7 +70,7 @@ The portable build extracts itself to a temp directory on every run, but stores 
 
 ## Release workflow
 
-Pushing a tag starting with `v` (for example `v0.1.0`) triggers `.github/workflows/release.yml`, which builds Windows, macOS and Linux installers, publishes them to GitHub Releases, and uploads `latest.yml` / `latest-mac.yml` / `latest-linux.yml` for `electron-updater`. Bump `version` in `package.json` before tagging so the tag, installer version and updater metadata stay in sync.
+Pushing a tag starting with `v` (for example `v0.1.1`) triggers `.github/workflows/release.yml`, which builds Windows, macOS and Linux installers, publishes them to GitHub Releases, and uploads `latest.yml` / `latest-mac.yml` / `latest-linux.yml` for `electron-updater`. Bump `version` in `package.json` before tagging so the tag, installer version and updater metadata stay in sync.
 
 Packaged builds check for updates shortly after startup and also expose "Check for updates" in the main menu. Code signing is disabled by default; macOS auto-update requires a signed and notarized app.
 
