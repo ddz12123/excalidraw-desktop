@@ -33,16 +33,27 @@ const waitForLoad = async (
   window: BrowserWindow,
   timeoutMs: number,
 ): Promise<void> => {
-  if (!window.webContents.isLoading()) {
+  const contents = window.webContents;
+
+  if (!contents.isLoading()) {
     return;
   }
 
+  // settle on close too: a destroyed window never fires did-finish-load
   await new Promise<void>((resolve) => {
-    const timer = setTimeout(resolve, timeoutMs);
-    window.webContents.once("did-finish-load", () => {
+    const settle = () => {
       clearTimeout(timer);
+      contents.removeListener("did-finish-load", onLoaded);
+      window.removeListener("closed", onClosed);
       resolve();
-    });
+    };
+
+    const onLoaded = () => settle();
+    const onClosed = () => settle();
+
+    const timer = setTimeout(settle, timeoutMs);
+    contents.once("did-finish-load", onLoaded);
+    window.once("closed", onClosed);
   });
 };
 

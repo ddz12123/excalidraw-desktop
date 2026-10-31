@@ -1,3 +1,4 @@
+import { createHash, timingSafeEqual } from "node:crypto";
 import { createServer } from "node:http";
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -81,6 +82,7 @@ const createMcpServer = () => {
         "Add elements to the canvas from Excalidraw skeleton objects and return the created element ids.",
         "Shapes (rectangle, ellipse, diamond) need { type, x, y, width, height }. Text needs { type: 'text', text, x, y }. Arrows and lines accept width/height (default 100x0) and optional points; width 0 or height 0 is valid for vertical/horizontal arrows, but prefer passing explicit points for them. Arrow start/end ids can only reference elements created in the same call. Frames need child element ids.",
         "Skeletons support labels (label: { text, fontSize? }), temporary ids (id, needed when other elements reference them), and arrow bindings (start: { id } / end: { id }).",
+        "Validation: unsupported types are rejected; every element needs numeric x/y; text needs a non-empty text; image needs a fileId of an existing file (this server cannot create images).",
         "Style properties: strokeColor, backgroundColor, fillStyle, strokeStyle, strokeWidth, roughness, opacity, roundness, angle.",
         "Coordinates are scene coordinates; lay elements out left-to-right / top-to-bottom with spacing to avoid overlaps.",
       ].join(" "),
@@ -111,6 +113,7 @@ const createMcpServer = () => {
         "Update existing elements by id. Each update is an object with an id plus any of these props:",
         "x, y, width, height, angle, strokeColor, backgroundColor, fillStyle, strokeWidth, strokeStyle, roughness, opacity, roundness, locked.",
         "Text content and labels cannot be changed in place; delete the text element and add a new one instead.",
+        "Moving or resizing a shape keeps its bound label attached and re-wrapped.",
       ].join(" "),
       inputSchema: {
         updates: z
@@ -129,7 +132,8 @@ const createMcpServer = () => {
     "delete_elements",
     {
       title: "Delete elements",
-      description: "Delete elements from the canvas by id.",
+      description:
+        "Delete elements from the canvas by id. Deleting a shape also deletes its bound label, unbinds arrows pointing at it and releases the children of a deleted frame.",
       inputSchema: {
         ids: z
           .array(z.string())
@@ -196,7 +200,16 @@ const isAuthorized = (
     : "";
   const token = bearer || url.searchParams.get("token") || "";
 
-  return token.length > 0 && token === settings.token;
+  if (token.length === 0 || settings.token.length === 0) {
+    return false;
+  }
+
+  // compare fixed-length digests so the comparison is constant-time and
+  // the token length never leaks
+  const provided = createHash("sha256").update(token).digest();
+  const expected = createHash("sha256").update(settings.token).digest();
+
+  return timingSafeEqual(provided, expected);
 };
 
 const handleRequest = async (
@@ -237,6 +250,14 @@ const handleRequest = async (
   const transport = new StreamableHTTPServerTransport({
     sessionIdGenerator: undefined,
     enableJsonResponse: true,
+    // rejects requests whose Host header was not produced for this endpoint,
+    // so a malicious page cannot reach the local server via DNS rebinding
+    enableDnsRebindingProtection: true,
+    allowedHosts: [
+      `127.0.0.1:${settings.port}`,
+      `localhost:${settings.port}`,
+      `[::1]:${settings.port}`,
+    ],
   });
 
   response.on("close", () => {

@@ -89,7 +89,7 @@ pnpm exec electron-builder --linux --x64
 2. 启用服务器并点击“保存并应用”。
 3. 复制生成的客户端配置到 MCP 客户端并重启客户端。
 
-服务只监听 `127.0.0.1`，并且需要设置里的访问令牌。提供 `get_scene`、`add_elements`、`update_elements`、`delete_elements`、`export_image` 五个工具。生成的配置通过 `npx -y mcp-remote <endpoint>` 连接，兼容只支持 stdio 的客户端；支持 Streamable HTTP 的客户端可以直接使用 Endpoint URL。设置保存在应用用户数据目录下的 `mcp-server.json`。使用 `npx` 的机器需要安装 Node.js。
+服务只监听 `127.0.0.1`，并且需要设置里的访问令牌。提供 `get_scene`、`add_elements`、`update_elements`、`delete_elements`、`export_image` 五个工具。生成的配置通过 `npx -y mcp-remote <endpoint> --header "Authorization:${EXCALIDRAW_MCP_TOKEN}"` 连接（令牌以环境变量形式写在配置里，不会出现在命令行上），兼容只支持 stdio 的客户端；支持 Streamable HTTP 的客户端可以直接使用 Endpoint URL 并携带 `Authorization: Bearer <token>` 请求头。设置保存在应用用户数据目录下的 `mcp-server.json`。使用 `npx` 的机器需要安装 Node.js。
 
 ![MCP 服务器示例](./public/images/mcp-example.png)
 

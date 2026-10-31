@@ -82,7 +82,7 @@ The desktop app can expose the open canvas to MCP clients such as Claude Desktop
 2. Enable the server, then click **Save and apply**.
 3. Copy the generated client config into your MCP client and restart it.
 
-The server binds to `127.0.0.1` only and requires the access token shown in the dialog. It provides `get_scene`, `add_elements`, `update_elements`, `delete_elements` and `export_image` tools. The generated config uses `npx -y mcp-remote <endpoint>` so stdio-only clients work; clients with native Streamable HTTP support can use the endpoint URL directly. Settings are stored in `mcp-server.json` in the app's user data directory. `npx` requires Node.js on the machine running the MCP client.
+The server binds to `127.0.0.1` only and requires the access token shown in the dialog. It provides `get_scene`, `add_elements`, `update_elements`, `delete_elements` and `export_image` tools. The generated config connects via `npx -y mcp-remote <endpoint> --header "Authorization:${EXCALIDRAW_MCP_TOKEN}"` (token passed as an env var in the config, so it stays off the command line) for stdio-only clients; clients with native Streamable HTTP support can use the endpoint URL directly with an `Authorization: Bearer <token>` header. Settings are stored in `mcp-server.json` in the app's user data directory. `npx` requires Node.js on the machine running the MCP client.
 
 ![MCP server example](./public/images/mcp-example.png)
 

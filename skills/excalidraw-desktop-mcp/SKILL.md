@@ -20,7 +20,7 @@ If they are missing, tell the user to:
 
 Do not edit local `.excalidraw` files as a workaround unless the user asks for that.
 
-The generated config uses `npx -y mcp-remote <endpoint?token=…>`, so the first connection needs network access to fetch `mcp-remote`. Clients with native Streamable HTTP support can use the endpoint URL directly, with `Authorization: Bearer <token>` or the `?token=` query parameter.
+The generated config uses `npx -y mcp-remote <endpoint> --header "Authorization:${EXCALIDRAW_MCP_TOKEN}"` with the token supplied as an env var in the config, so it does not appear on the command line; the first connection needs network access to fetch `mcp-remote`. Clients with native Streamable HTTP support can use the endpoint URL directly with an `Authorization: Bearer <token>` header (the `?token=` query parameter is also accepted for compatibility).
 
 ## Tool reference
 
@@ -28,8 +28,8 @@ The generated config uses `npx -y mcp-remote <endpoint?token=…>`, so the first
 | --- | --- | --- | --- |
 | `get_scene` | Read the canvas before editing | none | `{ elements, appState }` |
 | `add_elements` | Add new elements | `{ elements: Skeleton[], select?: boolean }` | `{ added: { id, type, x, y, width, height }[] }` |
-| `update_elements` | Change existing elements by id | `{ updates: { id, ...props }[] }` | `{ updated, notFound }` |
-| `delete_elements` | Delete by id (bound labels are removed with their container) | `{ ids: string[] }` | `{ deleted, notFound }` |
+| `update_elements` | Change existing elements by id (bound labels follow moves/resizes) | `{ updates: { id, ...props }[] }` | `{ updated, notFound }` |
+| `delete_elements` | Delete by id (bound labels are removed with their container, bound arrows are unbound, frame children are released) | `{ ids: string[] }` | `{ deleted, notFound }` |
 | `export_image` | Render the whole scene to PNG for visual verification | none | image + byte-size text |
 
 `update_elements` accepts only: `x`, `y`, `width`, `height`, `angle`, `strokeColor`, `backgroundColor`, `fillStyle`, `strokeWidth`, `strokeStyle`, `roughness`, `opacity`, `roundness`, `locked`. Width/height must be > 0; opacity 0–100.
@@ -52,7 +52,7 @@ The generated config uses `npx -y mcp-remote <endpoint?token=…>`, so the first
 - Arrow: `{ "type": "arrow", "x": 180, "y": 40, "width": 100, "height": 0, "start": { "id": "a" }, "end": { "id": "b" } }`
 - Styles: `strokeColor`, `backgroundColor`, `fillStyle` (`solid`/`hachure`/`cross-hatch`/`dots`), `strokeStyle` (`solid`/`dashed`/`dotted`), `strokeWidth`, `roughness` (0–2), `opacity`, `roundness: { "type": 3 }`, `angle`.
 
-Supported skeleton types: rectangle, ellipse, diamond, arrow, line, text, frame, stickynote. Images require an existing `fileId`, so do not use them for new content.
+Supported skeleton types: rectangle, ellipse, diamond, arrow, line, text, frame, stickynote. Malformed skeletons are rejected with an error: every element needs numeric `x`/`y` (frames may omit them), text needs a non-empty `text`, and images need an existing `fileId` — since the server cannot create images, do not use images for new content.
 
 See `references/element-skeletons.md` for the full field list, style palette and a complete flowchart payload.
 
@@ -63,7 +63,8 @@ See `references/element-skeletons.md` for the full field list, style palette and
 - **Bindings only work within one `add_elements` payload.** Arrow `start`/`end` ids cannot reference elements already on the canvas; include the shapes in the same call, or draw an unbound arrow with explicit `points`.
 - **Vertical/horizontal arrows need explicit `points`.** Use `"points": [[0, 0], [0, 70]]` for a vertical arrow (or `[[0, 0], [80, 0]]` for a horizontal one). Width/height `0` are valid, but older builds can misplace the arrow when `points` are omitted.
 - **Binding gaps are normal.** Excalidraw keeps a small gap between an arrowhead and the bound shape; this is not a misplaced arrow.
-- **Labels are elements.** A container label is a bound text element with `containerId`. Deleting the container deletes its label; deleting only the label leaves the container.
+- **Labels are elements.** A container label is a bound text element with `containerId`. Deleting the container deletes its label; deleting only the label leaves the container. `update_elements` on a shape's `x`/`y`/`width`/`height` moves and re-wraps its label automatically, but arrows bound to the shape are **not** re-routed — adjust their `points` after large moves if needed.
+- **Deleting cascades.** Deleting a shape deletes its bound label, unbinds arrows that pointed at it, and releases the children of a deleted frame (the children stay on the canvas).
 - **Coordinates are scene coordinates**, not screen pixels; `appState.zoom/scrollX/scrollY` only affect the view.
 - **Avoid overlapping existing content**; `get_scene` returns everything, including off-screen elements.
 - **No file uploads or image creation** through this MCP server.
@@ -76,5 +77,6 @@ See `references/element-skeletons.md` for the full field list, style palette and
 | Connection refused | Server disabled, app not running, or wrong port. Minimizing to the tray keeps the server running while the window is hidden. |
 | `MCP bridge is not ready` / `Renderer command timed out` | The app is still loading or reloading. Wait and retry once. |
 | `The canvas is empty` on export | Add elements first. |
+| `Unsupported element type` / `needs a non-empty text` / `needs a fileId` | The payload failed validation; fix the skeleton fields listed in the error and retry. |
 | Text did not change | Text edits are unsupported; delete and re-add. |
 | Diagram appears off-screen | New elements were placed over existing or negative bounds; re-place with `update_elements` or add below existing content. |

@@ -105,13 +105,22 @@ export const McpSettingsDialog = ({ onClose }: { onClose: () => void }) => {
   };
 
   const endpoint = `http://127.0.0.1:${port || "8765"}/mcp`;
-  const endpointWithToken = `${endpoint}?token=${encodeURIComponent(token)}`;
+  // pass the token through an env var + header instead of the URL query so it
+  // never shows up in the mcp-remote command line or proxy logs
+  const tokenEnvVar = "EXCALIDRAW_MCP_TOKEN";
   const clientConfig = JSON.stringify(
     {
       mcpServers: {
         "excalidraw-desktop": {
           command: "npx",
-          args: ["-y", "mcp-remote", endpointWithToken],
+          args: [
+            "-y",
+            "mcp-remote",
+            endpoint,
+            "--header",
+            `Authorization:\${${tokenEnvVar}}`,
+          ],
+          env: { [tokenEnvVar]: `Bearer ${token.trim()}` },
         },
       },
     },
@@ -290,7 +299,7 @@ export const McpSettingsDialog = ({ onClose }: { onClose: () => void }) => {
                 </FilledButton>
                 <FilledButton
                   variant="outlined"
-                  onClick={() => void copyText("endpoint", endpointWithToken)}
+                  onClick={() => void copyText("endpoint", endpoint)}
                 >
                   {copied === "endpoint"
                     ? t("mcpServer.copied")

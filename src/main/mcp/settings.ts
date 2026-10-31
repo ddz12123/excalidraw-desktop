@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import { readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { app } from "electron";
@@ -61,7 +61,17 @@ export const loadMcpSettings = (): McpServerSettings => {
     );
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-      console.warn("[mcp] invalid settings, regenerating", error);
+      // keep the unreadable/corrupt file around so the user's port and token
+      // are recoverable instead of silently lost
+      try {
+        copyFileSync(settingsPath(), `${settingsPath()}.bak`);
+      } catch (backupError) {
+        console.warn("[mcp] failed to back up settings", backupError);
+      }
+      console.warn(
+        "[mcp] invalid settings, regenerating (previous file kept as mcp-server.json.bak)",
+        error,
+      );
     }
     const settings = createDefaultSettings();
     try {
