@@ -1,6 +1,6 @@
 {
   "name": "excalidraw-desktop",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": true,
   "description": "Local-first offline Excalidraw desktop app",
   "author": "ddz12123 <ddz12123@users.noreply.github.com>",
